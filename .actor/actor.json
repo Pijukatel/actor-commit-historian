@@ -1,0 +1,13 @@
+{
+	"actorSpecification": 1,
+	"name": "repo-commit-helper",
+	"title": "Empty Python project",
+	"description": "Empty project in Python.",
+	"version": "0.0",
+	"buildTag": "latest",
+	"meta": {
+		"templateId": "python-empty"
+	},
+	"dockerfile": "./Dockerfile",
+	"input": "./input_schema.json"
+}
