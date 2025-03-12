@@ -3,24 +3,24 @@
     "type": "object",
     "schemaVersion": 1,
     "properties": {
-        "github_token": {
-            "title": "Github token",
-            "type": "string",
-            "isSecret": true,
-            "description": "Github token will be used to get the commits from Github API.",
-            "editor": "textfield"
-        },
         "prompt": {
             "title": "Prompt for the AI agent",
             "type": "string",
             "description": "Define question or task for the agent.",
             "editor": "textfield",
-            "prefill": "Show the most complicated change done last week."
+            "prefill": "Show three most complicated changes done last week."
         },
         "repo": {
             "title": "Github repository to be analyzed",
             "type": "string",
             "description": "Github repository that will be used to get commits and answer the question.",
+            "editor": "textfield",
+            "prefill": "apify/crawlee-python"
+        },
+        "branch": {
+            "title": "Repository branch",
+            "type": "string",
+            "description": "Github repository branch that will be used to get commits. If not specified then it will use default repo branch.",
             "editor": "textfield",
             "prefill": "apify/crawlee-python"
         },
@@ -32,5 +32,5 @@
             "editor": "textfield"
         }
     },
-    "required": ["github_token", "repo", "prompt"]
+    "required": ["repo", "prompt"]
 }

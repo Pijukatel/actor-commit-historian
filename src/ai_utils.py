@@ -1,9 +1,10 @@
 import asyncio
 from dataclasses import dataclass
 
-from github import Commit, Github, Auth
 from pydantic_ai import Agent, Tool, RunContext
 from datetime import datetime
+
+from src.git_utils import get_commits
 
 
 @dataclass
@@ -17,7 +18,7 @@ time_scope_analyzer = Agent(
     result_type=list[datetime, datetime],
     system_prompt=(
         f"Based on the prompt suggest time scope of the question and return it in datetime format with start date and"
-        f" end date. Today is {datetime.now()}. "
+        f" end date. Datetime should be offset-aware, use timezone UTC +2. Today is {datetime.now()}. "
     ),
     deps_type=datetime,
 )
@@ -29,42 +30,30 @@ is_commit_relevant = Agent(
 )
 
 
-def commit_to_string(commit: Commit):
-    return (
-        f"Author: {commit.commit.author.name}\n Url: {commit.html_url}\n Date: {commit.commit.author.date}\n"
-        f"Commit message: {commit.raw_data['commit']['message']}\n"
-    )
-
-
 async def prepare_commit_summaries(ctx: RunContext[Deps]) -> str:
     """Aggregate all relevant commits into single string."""
 
     # Get time scope of the question
     start, end = (await time_scope_analyzer.run(ctx.prompt)).data
-    commits = (
-        Github(auth=Auth.Token(ctx.deps.github_token))
-        .get_repo(ctx.deps.repo_name)
-        .get_commits(since=start, until=end)
-    )
-    commit_summaries: list[str] = []
+    all_commit_summaries = get_commits(ctx.deps.repo_name, since=start, until=end)
 
-    async def append_commit_summary_if_relevant(commit: Commit):
-        """Append commit if it is relevant for the prompt."""
-        commit_summary = commit_to_string(commit)
+    async def keep_relevant_commit_summary(commit_summary: str) -> str | None:
+        """Keep only commit relevant for the prompt. Filtering to reduce context size of the final prompt"""
         if (
             await is_commit_relevant.run(
                 f"Is following commit (Commit start) {commit_summary} (Commit end)\n"
                 f"related to this prompt: {ctx.prompt}"
             )
         ).data:
-            commit_summaries.append(commit_summary)
+            return commit_summary
 
     tasks = [
-        asyncio.create_task(append_commit_summary_if_relevant(commit))
-        for commit in commits
+        asyncio.create_task(keep_relevant_commit_summary(commit_summary))
+        for commit_summary in all_commit_summaries
     ]
-    await asyncio.gather(*tasks)
-    return "\n".join(commit_summaries)
+    # gather retains order of tasks (time ordered commits remain ordered)
+    filtered_commit_summaries = await asyncio.gather(*tasks)
+    return "\n".join([result for result in filtered_commit_summaries if result])
 
 
 repo_commit_analyzer = Agent(

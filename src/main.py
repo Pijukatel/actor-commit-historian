@@ -10,7 +10,7 @@ async def main() -> None:
             "OPENAI_API_KEY", actor_input.get("open_ai_key", "missing key")
         )
 
-        from src.ai_helpers import repo_commit_analyzer, Deps
+        from src.ai_utils import repo_commit_analyzer, Deps
 
         response = (
             await repo_commit_analyzer.run(
