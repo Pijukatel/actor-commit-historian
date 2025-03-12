@@ -12,16 +12,19 @@ async def main() -> None:
 
         from src.ai_utils import repo_commit_analyzer, Deps
 
-        response = (
-            await repo_commit_analyzer.run(
-                user_prompt=actor_input.get("prompt"),
-                deps=Deps(
-                    github_token=actor_input.get("github_token"),
-                    repo_name=actor_input.get("repo"),
-                ),
-            )
-        ).data
-        Actor.log.info(response)
+        response = await repo_commit_analyzer.run(
+            user_prompt=actor_input.get("prompt"),
+            deps=Deps(
+                branch=actor_input.get("branch") or None,
+                repo_name=actor_input.get("repo"),
+                logger=Actor.log,
+            ),
+        )
+        await Actor.charge(event_name="answer_generated", count=1)
+
+        Actor.log.info(
+            f"Commit analysis was finished. Here is the answer:\n{response.data}"
+        )
         await (await Actor.open_dataset()).push_data(
-            {"Prompt": actor_input.get("prompt"), "Response": response}
+            {"Prompt": actor_input.get("prompt"), "Response": response.data}
         )

@@ -22,7 +22,7 @@
             "type": "string",
             "description": "Github repository branch that will be used to get commits. If not specified then it will use default repo branch.",
             "editor": "textfield",
-            "prefill": "apify/crawlee-python"
+            "prefill": ""
         },
         "open_ai_key": {
             "title": "OpenAI token",
