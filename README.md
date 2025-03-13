@@ -4,7 +4,7 @@ Simple tool to help analyze Github repository commits.  It checkouts the reposit
 
 ## How to run it
 
-You can pick this actor from [Apify store](https://apify.com/josef.prochazka/commit-historian) and run it on the Apify platform.
+You can pick this actor from [Apify store](https://apify.com/josef.prochazka/commit-historian-agent) and run it on the Apify platform.
 
 
 ## How it works
