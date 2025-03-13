@@ -21,9 +21,9 @@ async def main() -> None:
             ),
         )
         if actor_input.get("open_ai_key", ""):
-            await Actor.charge(event_name="with_apify_token", count=1)
-        else:
             await Actor.charge(event_name="with_own_token", count=1)
+        else:
+            await Actor.charge(event_name="with_apify_token", count=1)
 
         Actor.log.info(
             f"Commit analysis was finished. Here is the answer:\n{response.data}"
