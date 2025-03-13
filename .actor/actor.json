@@ -3,7 +3,7 @@
 	"name": "commit-historian",
 	"title": "Commit historian",
 	"description": "This actor allows you to ask questions about any github repository. The actor uses OpenAI to analyze commit messages to answer your question. This actor is simple example use case for PydanticAI framework.",
-	"version": "0.0",
+	"version": "0.1",
 	"buildTag": "latest",
 	"meta": {
 		"templateId": "python-empty"

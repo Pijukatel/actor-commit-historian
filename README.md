@@ -2,6 +2,10 @@
 
 Simple tool to help analyze Github repository commits.  It checkouts the repository and get all relevant commit messages. It uses OpenAI to answer questions asked by the user. This is done through [PydanticAI](https://ai.pydantic.dev/) framework.
 
+## How to run it
+
+You can pick this actor from [Apify store](https://apify.com/apify/commit-historian) and run it on the Apify platform.
+
 
 ## How it works
 
