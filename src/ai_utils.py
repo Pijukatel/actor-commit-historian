@@ -3,7 +3,7 @@ import logging
 from dataclasses import dataclass
 
 from pydantic_ai import Agent, Tool, RunContext
-from datetime import datetime
+from datetime import datetime, timezone
 
 from src.git_utils import get_commits
 
@@ -15,20 +15,27 @@ class Deps:
     logger: logging.Logger
 
 
+@dataclass
+class TimeScope:
+    start: datetime
+    end: datetime
+
+
 time_scope_analyzer = Agent(
-    "openai:gpt-4o-mini",
-    result_type=list[datetime, datetime],
+    "openai:gpt-4o",
+    result_type=TimeScope,
     system_prompt=(
-        f"Based on the prompt suggest time scope of the question and return it in datetime format with start date and"
-        f" end date. Datetime should be offset-aware, use timezone UTC +2. Today is {datetime.now()}. "
+        f"Based on the prompt suggest time scope of the question and return only two dates in datetime format."
+        f" First is start date and second is end date. For the reference, today is {datetime.now(tz=timezone.utc)}."
     ),
-    deps_type=datetime,
 )
 
+
 is_commit_relevant = Agent(
-    "openai:gpt-4o-mini",
+    "openai:gpt-4o",
     result_type=bool,
-    system_prompt="Decide whether a commit is related to prompt.",
+    system_prompt="Decide whether a commit is related to the prompt. Do not involve time in the decision."
+    "If you are not sure, then it is related.",
 )
 
 
@@ -36,12 +43,18 @@ async def prepare_commit_summaries(ctx: RunContext[Deps]) -> str:
     """Aggregate all relevant commits into single string."""
 
     # Get time scope of the question
-    start, end = (await time_scope_analyzer.run(ctx.prompt)).data
+    time_scope: TimeScope = (await time_scope_analyzer.run(ctx.prompt)).data
+    ctx.deps.logger.info(f"Suggested time scope of the question: {time_scope}.")
     ctx.deps.logger.info(f"Checkout git repository.")
     all_commit_summaries = get_commits(
-        repo_name=ctx.deps.repo_name, branch=ctx.deps.branch, since=start, until=end
+        repo_name=ctx.deps.repo_name,
+        branch=ctx.deps.branch,
+        since=time_scope.start.astimezone(timezone.utc),
+        until=time_scope.end.astimezone(timezone.utc),
     )
-    ctx.deps.logger.info(f"Checkout finished.")
+    ctx.deps.logger.info(
+        f"Checkout finished. There are {len(all_commit_summaries)} commits in the question time scope."
+    )
 
     async def keep_relevant_commit_summary(commit_summary: str) -> str | None:
         """Keep only commit relevant for the prompt. Filtering to reduce context size of the final prompt"""
@@ -60,8 +73,13 @@ async def prepare_commit_summaries(ctx: RunContext[Deps]) -> str:
     ]
     # gather retains order of tasks (time ordered commits remain ordered)
     filtered_commit_summaries = await asyncio.gather(*tasks)
-    ctx.deps.logger.info(f"Analyze relevant commits.")
-    return "\n".join([result for result in filtered_commit_summaries if result])
+    relevant_commit_summaries = [
+        result for result in filtered_commit_summaries if result
+    ]
+    ctx.deps.logger.info(
+        f"Analyze relevant commits. {len(relevant_commit_summaries)} commits seems related to the question."
+    )
+    return "\n".join(relevant_commit_summaries)
 
 
 repo_commit_analyzer = Agent(

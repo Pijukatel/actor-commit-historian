@@ -6,8 +6,8 @@ async def main() -> None:
     """Main entry point for the Apify Actor."""
     async with Actor:
         actor_input = await Actor.get_input()
-        os.environ.setdefault(
-            "OPENAI_API_KEY", actor_input.get("open_ai_key", "missing key")
+        os.environ["OPENAI_API_KEY"] = (
+            actor_input.get("open_ai_key", "") or os.environ["OPENAI_API_KEY"]
         )
 
         from src.ai_utils import repo_commit_analyzer, Deps
@@ -20,7 +20,10 @@ async def main() -> None:
                 logger=Actor.log,
             ),
         )
-        await Actor.charge(event_name="answer_generated", count=1)
+        if actor_input.get("open_ai_key", ""):
+            await Actor.charge(event_name="with_apify_token", count=1)
+        else:
+            await Actor.charge(event_name="with_own_token", count=1)
 
         Actor.log.info(
             f"Commit analysis was finished. Here is the answer:\n{response.data}"

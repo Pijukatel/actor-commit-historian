@@ -19,22 +19,14 @@ def get_commits(
     """Get list of commits each summarized into single string."""
     repo_url = f"https://github.com/{repo_name}"
 
-    def print_on_one_line(*args: any):
-        print(
-            "", end="\r Repo checkout progress: " + " ".join(str(arg) for arg in args)
-        )
-
     with TemporaryDirectory() as temp_dir:
-        repo = Repo.clone_from(
-            f"{repo_url}.git", temp_dir, progress=print_on_one_line, branch=branch
-        )
-        print("\n")
+        repo = Repo.clone_from(f"{repo_url}.git", temp_dir, branch=branch)
         repo.git.checkout()
         commits = []
         for commit in repo.iter_commits():
-            if commit.committed_datetime < since:
+            if commit.committed_datetime.astimezone(timezone.utc) < since:
                 break
-            elif commit.committed_datetime < until:
+            elif commit.committed_datetime.astimezone(timezone.utc) < until:
                 commits.append(commit_to_string(repo_url, commit))
     return commits
 
