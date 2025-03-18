@@ -2,7 +2,7 @@
 	"actorSpecification": 1,
 	"name": "commit-historian-agent",
 	"title": "Commit Historian Agent",
-	"description": "This actor allows you to ask questions about any github repository. The actor uses OpenAI to analyze commit messages to answer your question. This actor is simple example use case for PydanticAI framework.",
+	"description": "This Actor allows you to analyze GitHub repository commits. It checks out the repository and retrieves all relevant commit messages. It uses OpenAI to answer questions. It is implemented in the PydanticAI framework..",
 	"version": "0.1",
 	"buildTag": "latest",
 	"meta": {
