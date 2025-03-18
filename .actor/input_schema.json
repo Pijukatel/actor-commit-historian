@@ -1,0 +1,36 @@
+{
+    "title": "Get insights about repo",
+    "type": "object",
+    "schemaVersion": 1,
+    "properties": {
+        "prompt": {
+            "title": "Prompt for the AI agent",
+            "type": "string",
+            "description": "Define question or task for the agent.",
+            "editor": "textfield",
+            "prefill": "Show the most complicated changes done last month."
+        },
+        "repository": {
+            "title": "Github repository to be analyzed",
+            "type": "string",
+            "description": "Github repository that will be used to get commits and answer the question.",
+            "editor": "textfield",
+            "prefill": "apify/crawlee-python"
+        },
+        "branch": {
+            "title": "Repository branch",
+            "type": "string",
+            "description": "Github repository branch that will be used to get commits. If not specified then it will use default repo branch.",
+            "editor": "textfield",
+            "prefill": ""
+        },
+        "openAIApiKey": {
+            "title": "OpenAI token",
+            "type": "string",
+            "isSecret": true,
+            "description": "Your own OpenAI token. Optional, but you will be charged more if you want to use Apify's token.",
+            "editor": "textfield"
+        }
+    },
+    "required": ["repository", "prompt"]
+}
