@@ -8,7 +8,7 @@
             "type": "string",
             "description": "Define question or task for the agent.",
             "editor": "textfield",
-            "prefill": "Show several most complicated changes done last month."
+            "prefill": "Show the most complicated changes done last month."
         },
         "repository": {
             "title": "Github repository to be analyzed",

@@ -40,4 +40,9 @@ The tool for getting the commit summaries is responsible for suggesting the rele
 * Agent responsible for deciding whether individual commit is relevant for the prompt.
 
 
-
+## Learn more
+- [PydanticAI documentation](https://ai.pydantic.dev/) 
+- [PydanticAI on github](https://github.com/pydantic/pydantic-ai)
+- [AI agent architecture](https://blog.apify.com/ai-agent-architecture)
+- [What are AI agents](https://blog.apify.com/what-are-ai-agents/)
+- [How to build and monetize an AI agent on Apify](https://blog.apify.com/how-to-build-an-ai-agent/)
