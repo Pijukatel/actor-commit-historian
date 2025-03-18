@@ -15,7 +15,7 @@ You can pass your own OpenAI API key to significantly reduce the actor run costs
 ## Example
 
 **Inputs**:
-> prompt: Show several most complicated changes done last month.
+> prompt: Show the most complicated changes done last month.
 
 > repository: apify/crawlee-python
 
@@ -33,7 +33,7 @@ You can pass your own OpenAI API key to significantly reduce the actor run costs
 
 ## How does it work
 
-This actor defines one main [AI agent](https://ai.pydantic.dev/api/agent/) that is responsible for processing the prompt and return desired output. It uses one [tool](https://ai.pydantic.dev/api/tools/#pydantic_ai.tools.AgentDepsT) that gets the commit summaries for the main agent.
+This Actor defines one main [AI agent](https://ai.pydantic.dev/api/agent/) that is responsible for processing the prompt and return desired output. It uses one [tool](https://ai.pydantic.dev/api/tools/#pydantic_ai.tools.AgentDepsT) that gets the commit summaries for the main agent.
 
 The tool for getting the commit summaries is responsible for suggesting the relevant time scope of the prompt, getting the raw commit messages in the relevant time scope and prefilter the commits based on whether they seem relevant for the main prompt or not. It is using two different AI agents through what is described in PydanticAI documentation as [programatic agent hand-off](https://ai.pydantic.dev/multi-agent-applications/#programmatic-agent-hand-off):
 * Agent responsible for suggesting time scope of the prompt.
