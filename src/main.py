@@ -1,5 +1,6 @@
 import os
 from apify import Actor
+from src.ai_utils import Deps, get_repo_commit_analyzer
 
 
 async def main() -> None:
@@ -7,20 +8,18 @@ async def main() -> None:
     async with Actor:
         actor_input = await Actor.get_input()
         os.environ["OPENAI_API_KEY"] = (
-            actor_input.get("open_ai_key", "") or os.environ["OPENAI_API_KEY"]
+            actor_input.get("openAIApiKey", "") or os.environ["OPENAI_API_KEY"]
         )
 
-        from src.ai_utils import repo_commit_analyzer, Deps
-
-        response = await repo_commit_analyzer.run(
+        response = await get_repo_commit_analyzer().run(
             user_prompt=actor_input.get("prompt"),
             deps=Deps(
                 branch=actor_input.get("branch") or None,
-                repo_name=actor_input.get("repo"),
+                repo_name=actor_input.get("repository"),
                 logger=Actor.log,
             ),
         )
-        if actor_input.get("open_ai_key", ""):
+        if actor_input.get("openAIApiKey", ""):
             await Actor.charge(event_name="with_own_token", count=1)
         else:
             await Actor.charge(event_name="with_apify_token", count=1)

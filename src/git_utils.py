@@ -3,9 +3,6 @@ from tempfile import TemporaryDirectory
 
 from git import Commit, Repo
 
-repo_name = "apify/crawlee-python"
-
-
 TODAY = datetime.now(tz=timezone.utc)
 LAST_WEEK = TODAY - timedelta(days=7)
 
